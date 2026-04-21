@@ -1,0 +1,61 @@
+body{
+    background-color: #0C0D14;
+    color: white;
+    font-family: "Press Start 2P", system-ui;
+    font-weight: 400;
+    font-style: normal;
+}
+.container{
+    background-image: url(images/bgd.png);
+    background-color: rgb(161, 40, 40);
+    width: 1000px;
+    height: 800px;
+    margin:  auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;  
+}
+#startScreen {
+  background-image: url(images/startScreen.png);
+  background-size: cover;
+  background-position: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#play-btn {
+  background: none;
+  border: none;
+  transition: transform 0.2s ease-in-out;
+}
+#play-btn img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  padding-top: 100px;
+  width: 800px; 
+}
+#play-btn:active {
+  transform: scale(0.9);
+}
+
+
+#modal{
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    transition: all 1s;
+}
+#startGame{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 0;
+    margin-bottom: 10000px;
+}
