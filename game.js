@@ -35,6 +35,9 @@ let active = {}; // tracks which barrel slots currently have a monkey popped up
 let spawnTimers = []; // we collect all the timeouts here so we can cancel them cleanly on game over
 let countdownTimer = null;
 
+// saves the highest score the player has reached this session using localStorage
+let highScore = localStorage.getItem("wamHighScore") || 0;
+
 // wipes the container and builds the actual game layout from scratch
 function buildGameScreen() {
   container.innerHTML = "";
@@ -51,6 +54,7 @@ function buildGameScreen() {
     <span>SCORE: <span id="scoreDisplay">0</span></span>
     <span>TIME: <span id="timerDisplay">${gameSecond}</span>s</span>
     <span id="livesDisplay">🍌🍌🍌</span>
+    <span>BEST: <span id="highScoreDisplay">${highScore}</span></span>
   `;
   container.appendChild(hud);
 
@@ -170,15 +174,6 @@ function injectStyles() {
       display: block;
       object-fit: contain;
       mix-blend-mode: screen;
-    }
-    .monkey-wrap img::after{
-    width: 200%;
-    content: "";
-    top: -10px
-    bottom: -10px
-    left: -10px
-    right: -10px
-
     }
 
     .barrel-slot.hit-good .monkey-wrap img { filter: brightness(1.8) saturate(2); }
@@ -387,8 +382,10 @@ function triggerBombEffect() {
 function updateHUD() {
   const s = document.getElementById("scoreDisplay");
   const l = document.getElementById("livesDisplay");
+  const h = document.getElementById("highScoreDisplay");
   if (s) s.textContent = score;
   if (l) l.textContent = "🍌".repeat(lives) + "❌".repeat(3 - lives);
+  if (h) h.textContent = highScore;
 }
 
 // flashes a message in the center of the screen for a moment then hides it
@@ -400,12 +397,23 @@ function showMsg(text, type) {
   setTimeout(() => (el.className = ""), 650);
 }
 
+// saves the high score to localStorage if the player beat their previous best
+function saveHighScore() {
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem("wamHighScore", highScore);
+  }
+}
+
 // wraps everything up: stops all timers, shows the final score, and sets up the play again button
 function endGame() {
   running = false;
   spawnTimers.forEach(clearTimeout);
   spawnTimers = [];
   clearInterval(countdownTimer);
+
+  // check and save high score before showing the screen
+  saveHighScore();
 
   // give the player a little feedback based on how well they did
   const praise =
@@ -415,11 +423,14 @@ function endGame() {
         ? "🐒 Nice moves!"
         : "🍌 Keep swinging!";
 
+  // let the player know if they set a new record
+  const newBest = score >= highScore ? "<br><br>🌟 NEW HIGH SCORE!" : "";
+
   const screen = document.createElement("div");
   screen.id = "gameOverScreen";
   screen.innerHTML = `
     <h2>GAME OVER!</h2>
-    <p>FINAL SCORE: ${score}<br><br>${praise}</p>
+    <p>FINAL SCORE: ${score}${newBest}<br><br>${praise}</p>
     <button id="restartBtn">▶ PLAY AGAIN</button>
   `;
   container.appendChild(screen);
